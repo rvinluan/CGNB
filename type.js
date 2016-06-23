@@ -59,6 +59,7 @@ var ProgramManager = {
     $.each(this.programs, function(i, program) {
       if (program.auto) {
         program.run();
+        ProgramManager.resetAll()
       }
     })
   }
@@ -68,16 +69,6 @@ var ProgramManager = {
 
 
 $(function() {
-
-// Placeholder, created the initial programs on the page
-initPrograms()
-function initPrograms() {
-  var programs = ["create", "channel", "changer", "shield", "reach"]
-  $.each(programs, function() {
-    new Program(this)
-  })
-}
-
 
 // Get keypress and pass to program
 $(document).keypress(function(e){
@@ -94,7 +85,6 @@ $(document).keydown(function(e) {
     // Return key to run current command and reset
     if (e.keyCode && e.keyCode == '13') {
       ProgramManager.runAuto()
-      ProgramManager.resetAll()
     }
 
     // Escape, backspace, or delete keys to reset
@@ -184,6 +174,16 @@ Program.prototype.receiveChar = function(char) {
 Program.prototype.run = function() {
   console.log("Running: '" + this.command + "'")
   ProgramManager.resetAll()
+}
+
+
+// Placeholder, created the initial programs on the page
+initPrograms()
+function initPrograms() {
+  var programs = ["create", "channel", "changer", "shield", "reach"]
+  $.each(programs, function() {
+    new Program(this)
+  })
 }
 
 })
