@@ -1,7 +1,3 @@
-// TODO: Fix bug that resets everything on an unmatched key
-// TODO: Fix bug that starts the next program typing on the last letter
-// TODO: Fix bug that doesn't remove the auto state on typing completion
-
 var ProgramManager = {
 
   // Contains all existing programs
@@ -14,23 +10,19 @@ var ProgramManager = {
   findPrograms: function(char) {
     
     var matchedPrograms = []
+    var unmatchedPrograms = []
+    var inactivePrograms = false
 
     $.each(ProgramManager.programs, function(i, program) {
       
+      if (!program.active) { inactivePrograms = true }
       // If a program is both active and matches the character
       if (program.active && program.is_match(char)) {
-        // Send it the character (received by program.receiveChar())
-        ProgramManager.sendChar(char, program)
         matchedPrograms.push(program)
-      
       } else {
-        // Otherwise set it as inactive  
-        program.setInactive()
+        unmatchedPrograms.push(program)
       }
 
-      // Update it on screen regardless (TODO: transfer this to Program functions)
-      program.draw()
-    
     })
 
     // If there's only one matched program, set it to autocomplete
@@ -38,15 +30,28 @@ var ProgramManager = {
       matchedPrograms[0].setAuto()
     }
 
+    var finish = false;
+    $.each(matchedPrograms, function(i, program) {
+      // Send it the character (received by program.receiveChar())
+      if (ProgramManager.sendChar(char, program)) {
+        finish = true
+      }
+    })
 
-    if (matchedPrograms.length == 0) { //TODO: figure out active program bug
-      $.each(ProgramManager.programs, function(i, program) { program.reset() })
+    if (finish) {
+      return
     }
 
+    if (matchedPrograms.length > 0) {
+      $.each(unmatchedPrograms, function(i, program) {
+        // Otherwise set it as inactive
+        program.setInactive()
+      })
+    }    
   },
 
   sendChar: function(char, program) {
-    program.receiveChar(char)
+    return program.receiveChar(char)
   },
 
   resetAll: function() {
@@ -161,18 +166,26 @@ Program.prototype.is_match = function(char) {
 
 // Accepts a new character and removes the first untyped character, then redraws
 Program.prototype.receiveChar = function(char) {
+  // If the next untype character matches the argument
   if (this.untyped.charAt(0) == char) {
+    // Remove the next letter from untype
     this.untyped = this.untyped.substr(1)
+    // And redraw
+    this.draw()
   }
-  this.draw()
+
+  // If this was the last letter (aka the command was completed)
   if (this.untyped.length == 0) {
+    // Run this command
     this.run()
+    return true
   }
 }
 
 // Placeholder for running the program. Resets everything.
 Program.prototype.run = function() {
   console.log("Running: '" + this.command + "'")
+  // Reset everything
   ProgramManager.resetAll()
 }
 
