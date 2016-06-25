@@ -5,6 +5,8 @@
     //or perhaps that will fix itself when we don't have a random layout
 //TODO: more elegant sizing and positioning of the board relative to the canvas
 
+//GENERAL NOTE: the random() functions used here are p5's random functions.
+
 /*
 / The Board.
 / Contains a list of Nodes and their connections.
@@ -18,9 +20,10 @@ function Board() {
     this.connections = {};
 }
 
-//number of tiles in the grid
+//number of tiles in the grid (each direction)
+//total size is Board.gridSize^2
 Board.gridSize = 20;
-//pixel size of each tile
+//pixel dimensions of each side of a tile
 Board.gridTileSize = 500 / Board.gridSize;
 
 Board.prototype.init = function() {
@@ -30,7 +33,6 @@ Board.prototype.init = function() {
         this.connections[n.callSign] = [];
         if(i > 0) {
             //connect this node to a random previous node
-            //Open Question: is this the right way to store connections?
             this.connections[n.callSign].push( new Path(n, this.nodes[ Math.floor(random(i)) ]) );
         }
     }
@@ -54,9 +56,9 @@ Board.prototype.render = function() {
     //since we will be expanding out from the center
     translate(Board.gridSize/2 * Board.gridTileSize, Board.gridSize/2 * Board.gridTileSize);
     for (n in this.connections) {
-        this.connections[n].forEach(p => p.render());
+        this.connections[n].forEach(path => path.render());
     }
-    this.nodes.forEach(n => n.render());
+    this.nodes.forEach(node => node.render());
 }
 
 /*
@@ -67,7 +69,7 @@ function Node() {
     this.x = Math.floor(random(-Board.gridSize/2, Board.gridSize/2));
     this.y = Math.floor(random(-Board.gridSize/2, Board.gridSize/2));
     this.callSign = "abcdefg".charAt(random(7)) + "123456789".charAt(random(9));
-    //Open Question: should programs be a type/subclass of node or should a node contain a program?
+    //Open Question: should programs be a type/subclass of node or should a node contain a program as an instance variable?
     //this.type = 0;
     //this.program = null;
 }
