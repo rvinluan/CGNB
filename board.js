@@ -5,6 +5,7 @@
     //or perhaps that will fix itself when we don't have a random layout
 //TODO: more elegant sizing and positioning of the board relative to the canvas
 
+//GENERAL NOTE: the random() functions used here are p5's random functions.
 var random = function (min, max) {
 
   var rand = Math.random()
@@ -29,6 +30,7 @@ var random = function (min, max) {
   }
 };
 
+
 /*
 / The Board.
 / Contains a list of Nodes and their connections.
@@ -44,9 +46,10 @@ function Board() {
   this.currentID = 0
 }
 
-//number of tiles in the grid
+//number of tiles in the grid (each direction)
+//total size is Board.gridSize^2
 Board.gridSize = 20;
-//pixel size of each tile
+//pixel dimensions of each side of a tile
 Board.gridTileSize = 500 / Board.gridSize;
 
 Board.prototype.init = function() {
@@ -163,7 +166,7 @@ function Node() {
     this.x = Math.floor(random(-Board.gridSize/2, Board.gridSize/2));
     this.y = Math.floor(random(-Board.gridSize/2, Board.gridSize/2));
     this.callSign = "abcdefg".charAt(random(7)) + "123456789".charAt(random(9)) + "123456789".charAt(random(9)) + "123456789".charAt(random(9)) + "123456789".charAt(random(9));
-    //Open Question: should programs be a type/subclass of node or should a node contain a program?
+    //Open Question: should programs be a type/subclass of node or should a node contain a program as an instance variable?
     //this.type = 0;
     //this.program = null;
 }
