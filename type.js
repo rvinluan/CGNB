@@ -75,27 +75,25 @@ var ProgramManager = {
 
 $(function() {
 
+
 // Get keypress and pass to program
-$(document).keypress(function(e){
+document.addEventListener('keydown', function(e) {
 
   // Any alphanumeric key to search for programs
-  var char = (String.fromCharCode(e.which)); 
+  var char = e.key; 
   if(/[a-zA-Z0-9]/.test(char)) {
     ProgramManager.findPrograms(char)
   }
-});
 
-$(document).keydown(function(e) {
+  // Return key to run current command and reset
+  if (e.keyCode && e.keyCode == '13') {
+    ProgramManager.runAuto()
+  }
 
-    // Return key to run current command and reset
-    if (e.keyCode && e.keyCode == '13') {
-      ProgramManager.runAuto()
-    }
-
-    // Escape, backspace, or delete keys to reset
-    if (e.keyCode == '8' || e.keyCode == '27' || e.keyCode == '46') {
-      ProgramManager.resetAll()
-    }
+  // Escape, backspace, or delete keys to reset
+  if (e.keyCode == '8' || e.keyCode == '27' || e.keyCode == '46') {
+    ProgramManager.resetAll()
+  }
 
 });
 
