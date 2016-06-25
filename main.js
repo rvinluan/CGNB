@@ -1,7 +1,12 @@
+var b;
+
 function setup() {
-    console.log('hi');
+    createCanvas(500,500);
+    b = new Board();
+    b.init();
 }
 
 function draw() {
-    console.log('draw');
+    background(128);
+    b.render();
 }
