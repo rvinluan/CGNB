@@ -13,7 +13,7 @@ var ProgramManager = {
     var unmatchedPrograms = []
     var inactivePrograms = false
 
-    $.each(ProgramManager.programs, function(i, program) {
+    ProgramManager.programs.forEach(function(program) {
       
       if (!program.active) { inactivePrograms = true }
       // If a program is both active and matches the character
@@ -31,7 +31,7 @@ var ProgramManager = {
     }
 
     var finish = false;
-    $.each(matchedPrograms, function(i, program) {
+    matchedPrograms.forEach(function(program) {
       // Send it the character (received by program.receiveChar())
       if (ProgramManager.sendChar(char, program)) {
         finish = true
@@ -43,7 +43,7 @@ var ProgramManager = {
     }
 
     if (matchedPrograms.length > 0) {
-      $.each(unmatchedPrograms, function(i, program) {
+      unmatchedPrograms.forEach(function(program) {
         // Otherwise set it as inactive
         program.setInactive()
       })
@@ -55,13 +55,13 @@ var ProgramManager = {
   },
 
   resetAll: function() {
-    $.each(this.programs, function(i, program) {
+    this.programs.forEach(function(program) {
       program.reset()
     })
   },
 
   runAuto: function() {
-    $.each(this.programs, function(i, program) {
+    this.programs.forEach(function(program) {
       if (program.auto) {
         program.run();
         ProgramManager.resetAll()
@@ -194,8 +194,8 @@ Program.prototype.run = function() {
 initPrograms()
 function initPrograms() {
   var programs = ["create", "channel", "changer", "shield", "reach"]
-  $.each(programs, function() {
-    new Program(this)
+  programs.forEach(function(command) {
+    new Program(command)
   })
 }
 
