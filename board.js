@@ -280,9 +280,9 @@ Program.prototype.render = function() {
     } else {
       fill(100)
     }
-    rect(0,0,Board.gridTileSize,Board.gridTileSize);
+    rect(0,0,Board.gridTileSize*2,Board.gridTileSize);
     fill(0);
-    text(this.command, 0, 10);
+    text(this.command, -15, 5);
     pop();
 }
 
