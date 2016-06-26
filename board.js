@@ -4,7 +4,6 @@
 //TODO: make it so paths don't overlap?
     //or perhaps that will fix itself when we don't have a random layout
 //TODO: more elegant sizing and positioning of the board relative to the canvas
-
 //GENERAL NOTE: the random() functions used here are p5's random functions.
 var random = function (min, max) {
 
@@ -51,6 +50,8 @@ function Board() {
 Board.gridSize = 20;
 //pixel dimensions of each side of a tile
 Board.gridTileSize = 500 / Board.gridSize;
+
+Board.commands = ["debug", "ddos", "crack", "cypher", "hack", "corrupt", "horse", "root", "virus"]
 
 Board.prototype.init = function() {
   for(var i = 0; i < 5; i++) {
@@ -165,7 +166,7 @@ Board.prototype.runAuto = function() {
 function Node() {
     this.x = Math.floor(random(-Board.gridSize/2, Board.gridSize/2));
     this.y = Math.floor(random(-Board.gridSize/2, Board.gridSize/2));
-    this.callSign = "abcdefg".charAt(random(7)) + "123456789".charAt(random(9)) + "123456789".charAt(random(9)) + "123456789".charAt(random(9)) + "123456789".charAt(random(9));
+    this.callSign = Board.commands.splice(Math.floor(random(Board.commands.length)),1).toString()
     //Open Question: should programs be a type/subclass of node or should a node contain a program as an instance variable?
     //this.type = 0;
     //this.program = null;
@@ -277,15 +278,38 @@ Program.prototype.render = function() {
     translate(this.x*Board.gridTileSize, this.y*Board.gridTileSize);
     noStroke();
     if (this.auto) {
-      fill(color(0, 255, 0))
-    } else if (this.active) {
-      fill(255);
+      stroke(color(0, 255, 0))
+    }
+    if (this.active) {
+      fill(50);
     } else {
       fill(100)
     }
-    rect(0,0,Board.gridTileSize*2,Board.gridTileSize);
-    fill(0);
-    text(this.command, -15, 5);
+    var width = Board.gridTileSize*3
+    var padding = 8
+    rect(0,0,width,Board.gridTileSize);
+    
+    textFont("monospace")
+    var charNum = this.command.length
+    var currentPos = - charNum*4
+    var typed = this.command.substr(0, this.command.length - this.untyped.length)
+
+    noStroke();
+    fill(100);
+    for (let char of typed) {
+      text(char, currentPos, 3)
+      currentPos += padding
+    }
+    if (this.active) {
+      fill(255);
+    } else {
+      fill (130)
+    }
+    for (let char of this.untyped) {
+      text(char, currentPos, 3)
+      currentPos += padding
+    }
+
     pop();
 }
 
