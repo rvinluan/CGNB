@@ -10,6 +10,6 @@ function setup() {
 }
 
 function draw() {
-    background(128);
+    background(30);
     b.render();
 }

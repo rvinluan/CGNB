@@ -196,7 +196,8 @@ function Path(previous, next) {
 
 Path.prototype.render = function() {
     noFill();
-    stroke(0);
+    stroke(80);
+    strokeWeight(2)
     var gss = Board.gridTileSize;
     //this algorithm always travels x first, then y
     line( this.previous.x*gss, this.previous.y*gss, this.next.x*gss, this.previous.y*gss);
@@ -276,16 +277,22 @@ Program.prototype.run = function() {
 Program.prototype.render = function() {
     push();
     translate(this.x*Board.gridTileSize, this.y*Board.gridTileSize);
-    noStroke();
+    fill(30)
+    strokeWeight(1)
     if (this.auto) {
       stroke(color(0, 255, 0))
-    }
-    if (this.active) {
-      fill(50);
+    } else if (this.active) {
+      stroke(255)
     } else {
-      fill(100)
+      stroke (50)
     }
-    var width = Board.gridTileSize*3
+    // }
+    // if (this.active) {
+    //   fill(50);
+    // } else {
+    //   fill(100)
+    // }
+    var width = Board.gridTileSize*4
     var padding = 8
     rect(0,0,width,Board.gridTileSize);
     
@@ -303,7 +310,7 @@ Program.prototype.render = function() {
     if (this.active) {
       fill(255);
     } else {
-      fill (130)
+      fill (80)
     }
     for (let char of this.untyped) {
       text(char, currentPos, 3)
