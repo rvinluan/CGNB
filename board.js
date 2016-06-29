@@ -43,6 +43,7 @@ function Board() {
   //e.g. { node1: [Path, Path], node2: [Path], node3: [Path, Path, Path], node4: [Path] }
   this.connections = {};
   this.currentID = 0
+  this.power = new Power(0,0,20)
 }
 
 //number of tiles in the grid (each direction)
@@ -87,6 +88,7 @@ Board.prototype.render = function() {
     this.connections[n].forEach(p => p.render());
   }
   this.nodes.forEach(n => n.render());
+  this.power.render()
 }
 
 Board.prototype.getID = function() {
@@ -113,9 +115,9 @@ Board.prototype.findPrograms = function(char) {
   })
 
   // If there's only one matched program, set it to autocomplete
-  if (matchedPrograms.length == 1) {
-    matchedPrograms[0].setAuto()
-  }
+  // if (matchedPrograms.length == 1) {
+  //   matchedPrograms[0].setAuto()
+  // }
 
   var finish = false;
   matchedPrograms.forEach(function(program) {
@@ -134,9 +136,10 @@ Board.prototype.findPrograms = function(char) {
       // Otherwise set it as inactive
       program.setInactive()
     })
+    return true
+  } else {
+    return false
   }
-
-  console.log(matchedPrograms)
 }
 
 Board.prototype.sendChar = function(char, program) {
@@ -196,8 +199,8 @@ function Path(previous, next) {
 
 Path.prototype.render = function() {
     noFill();
-    stroke(80);
-    strokeWeight(2)
+    stroke(161,178,167);
+    strokeWeight(3)
     var gss = Board.gridTileSize;
     //this algorithm always travels x first, then y
     line( this.previous.x*gss, this.previous.y*gss, this.next.x*gss, this.previous.y*gss);
@@ -277,66 +280,43 @@ Program.prototype.run = function() {
 Program.prototype.render = function() {
     push();
     translate(this.x*Board.gridTileSize, this.y*Board.gridTileSize);
-    fill(30)
-    strokeWeight(1)
+    fill(26,21,26)
+    strokeWeight(3);
+    stroke(109,175,187)
+    textSize(22)
     if (this.auto) {
-      stroke(color(0, 255, 0))
+      //stroke(color(0, 255, 0))
     } else if (this.active) {
-      stroke(255)
+      stroke(109,175,187)
     } else {
-      stroke (50)
+      stroke(42,41,44)
     }
-    // }
-    // if (this.active) {
-    //   fill(50);
-    // } else {
-    //   fill(100)
-    // }
-    var width = Board.gridTileSize*4
-    var padding = 8
-    rect(0,0,width,Board.gridTileSize);
+
+    var width = Board.gridTileSize*5
+    var height = Board.gridTileSize*2
+    var padding = 13
+    rect(0,0,width,height);
     
-    textFont("monospace")
+    textFont("Inconsolata")
     var charNum = this.command.length
-    var currentPos = - charNum*4
+    var currentPos = - charNum*6
     var typed = this.command.substr(0, this.command.length - this.untyped.length)
 
     noStroke();
     fill(100);
     for (let char of typed) {
-      text(char, currentPos, 3)
+      text(char, currentPos, 6)
       currentPos += padding
     }
     if (this.active) {
-      fill(255);
+      fill(109,175,187)
     } else {
-      fill (80)
+      fill(42,41,44)
     }
     for (let char of this.untyped) {
-      text(char, currentPos, 3)
+      text(char, currentPos, 6)
       currentPos += padding
     }
 
     pop();
 }
-
-// Get keypress and pass to program
-document.addEventListener('keydown', function(e) {
-
-  // Any alphanumeric key to search for programs
-  var char = e.key; 
-  if(/[a-zA-Z0-9]/.test(char)) {
-    currentBoard.findPrograms(char)
-  }
-
-  // Return key to run current command and reset
-  if (e.keyCode && e.keyCode == '13') {
-    currentBoard.runAuto()
-  }
-
-  // Escape, backspace, or delete keys to reset
-  if (e.keyCode == '8' || e.keyCode == '27' || e.keyCode == '46') {
-    currentBoard.resetAll()
-  }
-
-})
