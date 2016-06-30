@@ -50,9 +50,10 @@ function Board() {
 
 //number of tiles in the grid (each direction)
 //total size is Board.gridSize^2
-Board.gridSize = 20;
+Board.gridSize = 8;
 //pixel dimensions of each side of a tile
-Board.gridTileSize = 500 / Board.gridSize;
+Board.padding = 50;
+Board.gridTileSize = (document.body.clientHeight - Board.padding*2) / Board.gridSize;
 
 Board.commands = ["debug", "ddos", "crack", "cypher", "hack", "corrupt", "horse", "root", "virus"]
 
@@ -72,12 +73,12 @@ Board.prototype.init = function() {
 Board.prototype.render = function() {
   rectMode(CORNER);
   //draw the grid, for debug purposes
-  translate(50,50); //padding
+  translate(Board.padding,Board.padding);
   var gss = Board.gridTileSize;
   for(var i = 0; i < Board.gridSize; i++) {
     for(var j = 0; j < Board.gridSize; j++) {
       noFill();
-      stroke(0,0,0,14); 
+      stroke(255,255,255,10); 
       rect(i * gss, j * gss, gss, gss);
     }
   }
@@ -92,7 +93,7 @@ Board.prototype.render = function() {
   this.nodes.forEach(n => n.render());
   this.power.render()
   this.sparks.forEach(s => s.render())
-  if (this.prompt != null) { this.prompt.render() }
+  // if (this.prompt != null) { this.prompt.render() }
 }
 
 Board.prototype.getID = function() {
@@ -194,7 +195,7 @@ Node.prototype.render = function() {
     translate(this.x*Board.gridTileSize, this.y*Board.gridTileSize);
     noStroke();
     fill(255);
-    rect(0,0,Board.gridTileSize,Board.gridTileSize);
+    rect(0,0,20,20);
     fill(0);
     text(this.callSign, 0, 10);
     pop();

@@ -104,10 +104,10 @@ Program.prototype.render = function() {
     if (this.running > 0) {
       this.running-=0.03
     }
-    strokeWeight(3);
+    strokeWeight(1);
     stroke(109,175,187)
     if (this.active) { fill(109,175,187) }
-    textSize(22)
+    textSize(13)
     if (this.auto) {
       //stroke(color(0, 255, 0))
     } else if (this.focused) {
@@ -116,14 +116,14 @@ Program.prototype.render = function() {
       stroke(42,41,44)
     }
 
-    var width = Board.gridTileSize*5
-    var height = Board.gridTileSize*2
-    var padding = 13
+    var width = Board.gridTileSize/1.4
+    var height = Board.gridTileSize/3
+    var padding = 7
     rect(0,0,width,height);
     
     textFont("Inconsolata")
     var charNum = this.command.length
-    var currentPos = - charNum*6
+    var currentPos = - charNum*3
 
     noStroke();
     fill(255);

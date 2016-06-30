@@ -1,7 +1,7 @@
 var currentBoard;
 
 function setup() {
-    createCanvas(600,600);
+    createCanvas(document.body.clientHeight, document.body.clientHeight);
     currentBoard = new Board();
     currentBoard.init();
 }
