@@ -52,7 +52,7 @@ Spark.prototype.render = function() {
 }
 
 Spark.prototype.checkActive = function() {
-  if (this.active && this.program.active == false) {
+  if (this.active && this.program.focused == false) {
     this.active = false
 
     this.end = createVector(0,0)

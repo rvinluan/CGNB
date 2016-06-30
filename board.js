@@ -107,13 +107,13 @@ Board.prototype.findPrograms = function(char) {
   var board = this;
   var matchedPrograms = []
   var unmatchedPrograms = []
-  var inactivePrograms = false
+  var unfocusedPrograms = false
 
   board.programs.forEach(function(program) {
     
-    if (!program.active) { inactivePrograms = true }
-    // If a program is both active and matches the character
-    if (program.active && program.is_match(char)) {
+    if (!program.focused) { unfocusedPrograms = true }
+    // If a program is both focused and matches the character
+    if (program.focused && program.is_match(char)) {
       matchedPrograms.push(program)
     } else {
       unmatchedPrograms.push(program)
@@ -140,8 +140,8 @@ Board.prototype.findPrograms = function(char) {
 
   if (matchedPrograms.length > 0) {
     unmatchedPrograms.forEach(function(program) {
-      // Otherwise set it as inactive
-      program.setInactive()
+      // Otherwise set it as unfocused
+      program.unFocus()
     })
     return true
   } else {
@@ -227,8 +227,9 @@ function Program(command) {
   this.untyped = command // Tracks what's already been typed (for next char)
   this.typed = ""
   this.energized = ""
-  this.active = true // Tracks active state (inactive programs are ignored)
-  this.auto = false // Tracks whether only active program for autocompletion & styling
+  this.focused = true // Tracks focused state (unfocused programs are ignored)
+  this.active = false
+  this.auto = false // Tracks whether only focused program for autocompletion & styling
   this.running = 0
   
   currentBoard.programs.push(this) // Adds to set of programs on screen
@@ -238,14 +239,14 @@ Program.prototype.reset = function(char) {
   this.untyped = this.command
   this.typed = ""
   this.energized = ""
-  this.active = true
+  this.focused = true
   this.auto = false
 }
 
-// Sets the object to inactive and redraws
-Program.prototype.setInactive = function() {
-  if (this.active) {
-    this.active = false
+// Sets the object to unfocused and redraws
+Program.prototype.unFocus = function() {
+  if (this.focused) {
+    this.focused = false
     this.untyped = this.command
     this.typed = ""
     var program = this
@@ -315,7 +316,7 @@ Program.prototype.render = function() {
     textSize(22)
     if (this.auto) {
       //stroke(color(0, 255, 0))
-    } else if (this.active) {
+    } else if (this.focused) {
       stroke(109,175,187)
     } else {
       stroke(42,41,44)
@@ -341,7 +342,7 @@ Program.prototype.render = function() {
       text(char, currentPos, 6)
       currentPos += padding
     }
-    if (this.active) {
+    if (this.focused) {
       fill(109,175,187)
     } else {
       fill(42,41,44)
