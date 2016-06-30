@@ -244,10 +244,18 @@ Program.prototype.reset = function(char) {
 
 // Sets the object to inactive and redraws
 Program.prototype.setInactive = function() {
-  this.active = false
-  this.untyped = this.command
-  this.typed = ""
-  this.energized = ""
+  if (this.active) {
+    this.active = false
+    this.untyped = this.command
+    this.typed = ""
+    var program = this
+    this.energized.split('').forEach(function(char) {
+      console.log("doing it w/ " + char)
+      currentBoard.power.createSpark(char, program, true); 
+      
+    })
+    this.energized = ""
+  }
 }
 
 // Sets the object to autocomplete and redraws

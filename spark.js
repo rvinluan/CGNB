@@ -1,15 +1,25 @@
-function Spark(char, program) {
+function Spark(char, program, returning) {
   this.char = char
-  this.program = program
-  this.start = createVector(0,0) //default to 0,0
-  this.loc = this.start
-  this.end = createVector(program.loc.x, program.loc.y)
-  this.speed = 20
+  this.returning = false
+  console.log("returning is " + returning + " and program is " + program)
+  if (returning == true) { 
+    this.start = createVector(program.loc.x, program.loc.y)
+    this.end = createVector(0,0)
+    this.returning = true
+    this.active = false
+  } else {
+    this.program = program
+    this.start = createVector(0,0)
+    this.end = createVector(program.loc.x, program.loc.y)
+    this.active = true
+  }
+  
+  this.loc = this.start.copy()
+  this.speed = 2.5
   this.distance = this.start.dist(this.end)
-  this.velocity = this.end.sub(this.start).normalize().mult(2.5)
+  this.velocity = this.end.copy().sub(this.start).normalize().mult(this.speed)
+  console.log("distance: " + this.distance)
   this.moving = true
-  this.active = true
-  this.fade = 255
 }
 
 Spark.prototype.render = function() {
@@ -24,15 +34,17 @@ Spark.prototype.render = function() {
     pop()
 
   }
+  
 
-  if (this.active == false) {
-    this.fade-=10
-    if (this.fade <= 0) {
-      currentBoard.removeSpark(this)
+  if (this.loc.dist(this.end) < this.speed) {
+    
+    if (this.returning) {
+      currentBoard.power.energy += 1
+    } else {
+      this.program.receiveChar(this.char)
     }
-  } else if (this.loc.dist(this.end) > this.distance) {
+
     this.moving = false
-    this.program.receiveChar(this.char)
     currentBoard.removeSpark(this)
   }
 
@@ -40,7 +52,15 @@ Spark.prototype.render = function() {
 }
 
 Spark.prototype.checkActive = function() {
-  if (this.program.active == false) {
+  if (this.active && this.program.active == false) {
     this.active = false
+
+    this.end = createVector(0,0)
+    this.start = this.loc
+    this.distance = this.start.dist(this.end)
+    this.velocity = this.end.sub(this.start).normalize().mult(this.speed)
+
+    this.returning = true
+    
   }
 }

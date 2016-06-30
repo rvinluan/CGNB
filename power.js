@@ -77,8 +77,8 @@ Power.prototype.typeChar = function(char, program) {
   return program.typeChar(char)
 }
 
-Power.prototype.createSpark = function(char, program) {
-  currentBoard.sparks.push(new Spark(char, program))
+Power.prototype.createSpark = function(char, program, returning) {
+  currentBoard.sparks.push(new Spark(char, program, returning))
 }
 
 
