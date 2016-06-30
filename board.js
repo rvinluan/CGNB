@@ -286,8 +286,12 @@ Program.prototype.receiveChar = function(char) {
   }
   if (this.typed.length == 0 && this.untyped.length == 0) {
     // Run this command
-    this.run()
-    return true
+    var program = this
+    setTimeout(function() {
+      program.run()  
+      return true
+    }, 200)
+    
   }
 }
 
