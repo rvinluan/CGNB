@@ -1,15 +1,12 @@
-var b;
-
 var currentBoard;
 
 function setup() {
     createCanvas(600,600);
-    b = new Board();
-    currentBoard = b;
-    b.init();
+    currentBoard = new Board();
+    currentBoard.init();
 }
 
 function draw() {
     background(26,21,26);
-    b.render();
+    currentBoard.render();
 }

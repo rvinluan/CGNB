@@ -5,7 +5,7 @@ function Power(x, y, energy) {
   this.char = ""
   this.fade = 255
   this.recharge = 0;
-  this.rechargeRate = 100;
+  this.rechargeRate = 60;
   this.charMatch = true;
 }
 
@@ -31,7 +31,6 @@ Power.prototype.render = function() {
   this.recharge++
   if (this.recharge > this.rechargeRate) {
     this.recharge = 0;
-    console.log("yup")
     if (this.energy < this.maxEnergy) {
       this.energy++
     }
@@ -66,14 +65,20 @@ Power.prototype.newChar = function(char) {
     if (currentBoard.findPrograms(char)) {
       this.charMatch = true
       this.energy--
+      this.recharge = 0
     } else {
       this.charMatch = false
     }
   }
 }
 
-Power.prototype.sendChar = function(char, program) {
-  return program.receiveChar(char)
+Power.prototype.typeChar = function(char, program) {
+  this.createSpark(char, program)
+  return program.typeChar(char)
+}
+
+Power.prototype.createSpark = function(char, program) {
+  currentBoard.sparks.push(new Spark(char, program))
 }
 
 
@@ -86,10 +91,11 @@ document.addEventListener('keydown', function(e) {
     currentBoard.power.newChar(char)
   }
 
+  // ON SECOND THOUGHT auto doesn't feel very fun
   // Return key to run current command and reset
-  if (e.keyCode && e.keyCode == '13') {
-    currentBoard.runAuto()
-  }
+  // if (e.keyCode && e.keyCode == '13') {
+  //   currentBoard.runAuto()
+  // }
 
   // Escape, backspace, or delete keys to reset
   if (e.keyCode == '8' || e.keyCode == '27' || e.keyCode == '46') {

@@ -44,6 +44,7 @@ function Board() {
   this.connections = {};
   this.currentID = 0
   this.power = new Power(0,0,20)
+  this.sparks = [];
 }
 
 //number of tiles in the grid (each direction)
@@ -89,10 +90,16 @@ Board.prototype.render = function() {
   }
   this.nodes.forEach(n => n.render());
   this.power.render()
+  this.sparks.forEach(s => s.render())
 }
 
 Board.prototype.getID = function() {
   return this.currentID++
+}
+
+Board.prototype.removeSpark = function(spark) {
+  var i = this.sparks.indexOf(spark)
+  this.sparks.splice(i, 1)
 }
 
 Board.prototype.findPrograms = function(char) {
@@ -115,14 +122,14 @@ Board.prototype.findPrograms = function(char) {
   })
 
   // If there's only one matched program, set it to autocomplete
-  // if (matchedPrograms.length == 1) {
-  //   matchedPrograms[0].setAuto()
-  // }
+  if (matchedPrograms.length == 1) {
+    matchedPrograms[0].setAuto()
+  }
 
   var finish = false;
   matchedPrograms.forEach(function(program) {
     // Send it the character (received by program.receiveChar())
-    if (board.sendChar(char, program)) {
+    if (board.power.typeChar(char, program)) {
       finish = true
     }
   })
@@ -140,10 +147,6 @@ Board.prototype.findPrograms = function(char) {
   } else {
     return false
   }
-}
-
-Board.prototype.sendChar = function(char, program) {
-  return program.receiveChar(char)
 }
 
 Board.prototype.resetAll = function() {
@@ -169,6 +172,7 @@ Board.prototype.runAuto = function() {
 function Node() {
     this.x = Math.floor(random(-Board.gridSize/2, Board.gridSize/2));
     this.y = Math.floor(random(-Board.gridSize/2, Board.gridSize/2));
+    this.loc = {x:this.x*Board.gridTileSize, y:this.y*Board.gridTileSize}
     this.callSign = Board.commands.splice(Math.floor(random(Board.commands.length)),1).toString()
     //Open Question: should programs be a type/subclass of node or should a node contain a program as an instance variable?
     //this.type = 0;
@@ -221,30 +225,32 @@ function Program(command) {
 
   this.command = command // Initial command
   this.untyped = command // Tracks what's already been typed (for next char)
+  this.typed = ""
+  this.energized = ""
   this.active = true // Tracks active state (inactive programs are ignored)
   this.auto = false // Tracks whether only active program for autocompletion & styling
+  this.running = 0
   
   currentBoard.programs.push(this) // Adds to set of programs on screen
 }
 
 Program.prototype.reset = function(char) {
   this.untyped = this.command
+  this.typed = ""
+  this.energized = ""
   this.active = true
   this.auto = false
-  currentBoard.render()
 }
 
 // Sets the object to inactive and redraws
 Program.prototype.setInactive = function() {
   this.active = false
   this.untyped = this.command
-  currentBoard.render()
 }
 
 // Sets the object to autocomplete and redraws
 Program.prototype.setAuto = function(char) {
   this.auto = true
-  currentBoard.render()
 }
 
 // Checks if the next untyped character matches the argument
@@ -253,17 +259,22 @@ Program.prototype.is_match = function(char) {
 }
 
 // Accepts a new character and removes the first untyped character, then redraws
-Program.prototype.receiveChar = function(char) {
+Program.prototype.typeChar = function(char) {
   // If the next untype character matches the argument
   if (this.untyped.charAt(0) == char) {
     // Remove the next letter from untype
     this.untyped = this.untyped.substr(1)
-    // And redraw
-    currentBoard.render()
+    this.typed += char
   }
+}
 
-  // If this was the last letter (aka the command was completed)
-  if (this.untyped.length == 0) {
+Program.prototype.receiveChar = function(char) {
+  if (this.typed.charAt(0) == char) {
+    // Remove the next letter from untype
+    this.typed = this.typed.substr(1)
+    this.energized += char
+  }
+  if (this.typed.length == 0 && this.untyped.length == 0) {
     // Run this command
     this.run()
     return true
@@ -273,14 +284,18 @@ Program.prototype.receiveChar = function(char) {
 // Placeholder for running the program. Resets everything.
 Program.prototype.run = function() {
   console.log("Running: '" + this.command + "'")
+  this.running = 1;
   // Reset everything
   currentBoard.resetAll()
 }
 
 Program.prototype.render = function() {
     push();
-    translate(this.x*Board.gridTileSize, this.y*Board.gridTileSize);
-    fill(26,21,26)
+    translate(this.loc.x, this.loc.y);
+    fill(lerpColor(color(26,21,26), color(255,255,255), this.running))
+    if (this.running > 0) {
+      this.running-=0.03
+    }
     strokeWeight(3);
     stroke(109,175,187)
     textSize(22)
@@ -300,11 +315,15 @@ Program.prototype.render = function() {
     textFont("Inconsolata")
     var charNum = this.command.length
     var currentPos = - charNum*6
-    var typed = this.command.substr(0, this.command.length - this.untyped.length)
 
     noStroke();
+    fill(255);
+    for (let char of this.energized) {
+      text(char, currentPos, 6)
+      currentPos += padding
+    }
     fill(100);
-    for (let char of typed) {
+    for (let char of this.typed) {
       text(char, currentPos, 6)
       currentPos += padding
     }
