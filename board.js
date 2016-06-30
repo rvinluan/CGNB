@@ -246,6 +246,8 @@ Program.prototype.reset = function(char) {
 Program.prototype.setInactive = function() {
   this.active = false
   this.untyped = this.command
+  this.typed = ""
+  this.energized = ""
 }
 
 // Sets the object to autocomplete and redraws
