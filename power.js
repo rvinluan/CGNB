@@ -1,5 +1,6 @@
 function Power(x, y, energy) {
-  this.loc = {x: x, y: y}
+  this.x = x;
+  this.y = y;
   this.energy = energy
   this.maxEnergy = energy
   this.char = ""
@@ -11,7 +12,7 @@ function Power(x, y, energy) {
 
 Power.prototype.render = function() {
   push()
-  translate(this.x,this.x)
+  translate(this.x,this.y)
   noFill()
   strokeWeight(3)
   stroke(255,255,255); 

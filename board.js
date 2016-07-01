@@ -45,7 +45,9 @@ function Board() {
   this.currentID = 0
   this.power = new Power(0,0,20)
   this.sparks = [];
-  this.prompt = null
+  this.prompt = null;
+  this.openNodes = [this.power];
+  this.unplacedNodes = [];
 }
 
 //number of tiles in the grid (each direction)
@@ -60,14 +62,9 @@ Board.commands = ["debug", "ddos", "crack", "cypher", "hack", "corrupt", "horse"
 Board.prototype.init = function() {
   for(var i = 0; i < 5; i++) {
     var n = new Program();
-    this.nodes.push( n );
-    this.connections[n.callSign] = [];
-    if(i > 0) {
-      //connect this node to a random previous node
-      //Open Question: is this the right way to store connections?
-      this.connections[n.callSign].push( new Path(n, this.nodes[ Math.floor(random(i)) ]) );
-    }
+    this.unplacedNodes.push( n );
   }
+  this.openNewArea(this.openNodes[0], 0);
 }
 
 Board.prototype.render = function() {
@@ -94,6 +91,54 @@ Board.prototype.render = function() {
   this.power.render()
   this.sparks.forEach(s => s.render())
   // if (this.prompt != null) { this.prompt.render() }
+}
+
+Board.prototype.openNewArea = function(whichNode, whichDirection) {
+  var lastVisited = whichNode;
+  for(var i = 0; i < this.unplacedNodes.length; i++) {
+    var n = this.unplacedNodes[i];
+    var d = i == 0 ? whichDirection : Math.floor(random(4));
+    let x = lastVisited.x, y = lastVisited.y;
+    switch( d ) {
+      case 0 : 
+      //north
+      y -= 1;
+      break;
+      case 1 :
+      //east
+      x += 1;
+      break;
+      case 2 :
+      //south
+      y += 1;
+      break;
+      case 3 :
+      x -= 1;
+      break;
+    }
+    if(this.existsNodeAt(x, y)) {
+      console.log('collision');
+      i--;
+      continue;
+    }
+    n.x = x;
+    n.y = y;
+    this.nodes.push(n);
+    this.connections[n.callSign] = [ new Path(lastVisited, n) ];
+    lastVisited = n;
+  }
+}
+
+Board.prototype.existsNodeAt = function(x, y) {
+  if(x == 0 && y == 0) {
+    return true;
+  }
+  for(n in this.nodes) {
+    if(this.nodes[n].x == x && this.nodes[n].y == y) {
+      return true;
+    }
+  }
+  return false;
 }
 
 Board.prototype.getID = function() {
@@ -183,11 +228,14 @@ Board.prototype.runAuto = function() {
 function Node() {
     this.x = Math.floor(random(-Board.gridSize/2, Board.gridSize/2));
     this.y = Math.floor(random(-Board.gridSize/2, Board.gridSize/2));
-    this.loc = {x:this.x*Board.gridTileSize, y:this.y*Board.gridTileSize}
     this.callSign = Board.commands.splice(Math.floor(random(Board.commands.length)),1).toString()
     //Open Question: should programs be a type/subclass of node or should a node contain a program as an instance variable?
     //this.type = 0;
     //this.program = null;
+}
+
+Node.prototype.getLocation = function() {
+  return {x:this.x*Board.gridTileSize, y:this.y*Board.gridTileSize}
 }
 
 Node.prototype.render = function() {

@@ -99,7 +99,7 @@ Program.prototype.run = function() {
 
 Program.prototype.render = function() {
     push();
-    translate(this.loc.x, this.loc.y);
+    translate(this.getLocation().x, this.getLocation().y);
     fill(lerpColor(this.mainFill, color(255,255,255), this.running))
     if (this.running > 0) {
       this.running-=0.03
@@ -116,7 +116,7 @@ Program.prototype.render = function() {
       stroke(42,41,44)
     }
 
-    var width = Board.gridTileSize/1.4
+    var width = Board.gridTileSize/1.5
     var height = Board.gridTileSize/3
     var padding = 7
     rect(0,0,width,height);
