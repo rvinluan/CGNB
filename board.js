@@ -117,8 +117,9 @@ Board.prototype.openNewArea = function(whichNode, whichDirection) {
       break;
     }
     if(this.existsNodeAt(x, y)) {
-      console.log('collision');
-      i--;
+      //try this loop again.
+      //this works but seems shady
+      i--; 
       continue;
     }
     n.x = x;

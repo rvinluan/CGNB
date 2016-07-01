@@ -10,7 +10,7 @@ function Spark(char, program, returning) {
   } else {
     this.program = program
     this.start = createVector(0,0)
-    this.end = createVector(program.loc.x, program.loc.y)
+    this.end = createVector(program.getLocation().x, program.getLocation().y)
     this.active = true
   }
   
