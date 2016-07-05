@@ -29,6 +29,10 @@ var random = function (min, max) {
   }
 };
 
+Array.prototype.randomIn = function() {
+  return this[ Math.floor(Math.random() * this.length) ];
+}
+
 
 /*
 / The Board.
@@ -60,8 +64,8 @@ Board.gridTileSize = (document.body.clientHeight - Board.padding*2) / Board.grid
 Board.commands = ["debug", "ddos", "crack", "cypher", "hack", "corrupt", "horse", "root", "virus"]
 
 Board.prototype.init = function() {
-  for(var i = 0; i < 5; i++) {
-    var n = new Program();
+  for(var i = 0; i < 20; i++) {
+    var n = new Program( Board.commands.randomIn() );
     this.unplacedNodes.push( n );
   }
   this.openNewArea(this.openNodes[0], 0);
@@ -94,40 +98,60 @@ Board.prototype.render = function() {
 }
 
 Board.prototype.openNewArea = function(whichNode, whichDirection) {
-  var lastVisited = whichNode;
+  var thisBranch = [whichNode];
+  var lastVisited = thisBranch[0];
   for(var i = 0; i < this.unplacedNodes.length; i++) {
     var n = this.unplacedNodes[i];
-    var d = i == 0 ? whichDirection : Math.floor(random(4));
-    let x = lastVisited.x, y = lastVisited.y;
-    switch( d ) {
-      case 0 : 
-      //north
-      y -= 1;
-      break;
-      case 1 :
-      //east
-      x += 1;
-      break;
-      case 2 :
-      //south
-      y += 1;
-      break;
-      case 3 :
-      x -= 1;
-      break;
+    var possibleDirections = [0,1,2,3];
+    var d = i == 0 ? whichDirection : possibleDirections.randomIn();
+    var coord = this.relativeDirectionFrom(lastVisited.x, lastVisited.y, d);
+    while(this.existsNodeAt(coord.x, coord.y) || this.isOutOfBounds(coord.x, coord.y)) {
+      possibleDirections.splice(possibleDirections.indexOf(d), 1);
+      if(possibleDirections.length > 0) {
+        d = possibleDirections.randomIn();
+        coord = this.relativeDirectionFrom(lastVisited.x, lastVisited.y, d);
+      } else {
+        possibleDirections = [0,1,2,3];
+        lastVisited = thisBranch.pop();
+        d = possibleDirections.randomIn();
+        coord = this.relativeDirectionFrom(lastVisited.x, lastVisited.y, d);
+      }
     }
-    if(this.existsNodeAt(x, y)) {
-      //try this loop again.
-      //this works but seems shady
-      i--; 
-      continue;
-    }
-    n.x = x;
-    n.y = y;
+    n.x = coord.x;
+    n.y = coord.y;
     this.nodes.push(n);
-    this.connections[n.callSign] = [ new Path(lastVisited, n) ];
+    thisBranch.push(n);
+    if(this.connections[n.id]) {
+      this.connections[n.id].push[ new Path(lastVisited, n) ];
+    } else {
+      this.connections[n.id] = [ new Path(lastVisited, n) ];
+    }
     lastVisited = n;
+    console.log(this.connections);
   }
+}
+
+Board.prototype.relativeDirectionFrom = function(originX, originY, d) {
+  var ro = {x: originX, y: originY};
+  switch( d ) {
+    case 0 : 
+    //north
+    ro.y -= 1;
+    break;
+    case 1 :
+    //east
+    ro.x += 1;
+    break;
+    case 2 :
+    //south
+    ro.y += 1;
+    break;
+    case 3 :
+    //west
+    ro.x -= 1;
+    break;
+  }
+  return ro;
 }
 
 Board.prototype.existsNodeAt = function(x, y) {
@@ -140,6 +164,18 @@ Board.prototype.existsNodeAt = function(x, y) {
     }
   }
   return false;
+}
+
+Board.prototype.isOutOfBounds = function(x, y) {
+  if (
+    x < - Board.gridSize / 2 ||
+    x > Board.gridSize / 2 || 
+    y < - Board.gridSize / 2 ||
+    y > Board.gridSize / 2
+  ) { return true; }
+    else {
+      return false;
+    }
 }
 
 Board.prototype.getID = function() {
@@ -229,7 +265,7 @@ Board.prototype.runAuto = function() {
 function Node() {
     this.x = Math.floor(random(-Board.gridSize/2, Board.gridSize/2));
     this.y = Math.floor(random(-Board.gridSize/2, Board.gridSize/2));
-    this.callSign = Board.commands.splice(Math.floor(random(Board.commands.length)),1).toString()
+    this.id = Math.random() * new Date().getTime(); //lol for now
     //Open Question: should programs be a type/subclass of node or should a node contain a program as an instance variable?
     //this.type = 0;
     //this.program = null;
@@ -269,4 +305,7 @@ Path.prototype.render = function() {
     //this algorithm always travels x first, then y
     line( this.previous.x*gss, this.previous.y*gss, this.next.x*gss, this.previous.y*gss);
     line( this.next.x*gss, this.previous.y*gss, this.next.x*gss, this.next.y*gss);
+    //test?
+    line( this.previous.x*gss, this.previous.y*gss, this.next.x*gss, this.next.y*gss);
+
 }

@@ -8,8 +8,6 @@ Program.prototype.constructor = Program
 function Program(command) {
   Node.call(this)
 
-  command = this.callSign
-
   this.command = command // Initial command
   this.untyped = command // Tracks what's already been typed (for next char)
   this.typed = ""
