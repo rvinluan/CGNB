@@ -97,6 +97,20 @@ Board.prototype.render = function() {
   // if (this.prompt != null) { this.prompt.render() }
 }
 
+/* LAYOUT GENERATION
+//
+// steps:
+// 1) generate list of programs to be placed (unplacedNodes)
+// 2) start at one of the open positions, in a direction
+// 3) keep track of the nodes that have been placed in this branch so far (thisBranch)
+// 4) pick a random direction, try to place a node there
+//    4a) if you can't, that direction is ineligible, so remove it from the possible directions and try again until all directions are empty
+//    4b) if there are no possible directions left, step backwards in the branch array to the previously placed nodes
+//
+// TODO: if you're all the way at the beginning, then SOL I guess? figure out what to do here.
+// TODO: add open area points for navigation in the future
+// TODO: add the chance that some random connections form when there is an adjacent node
+*/
 Board.prototype.openNewArea = function(whichNode, whichDirection) {
   var thisBranch = [whichNode];
   var lastVisited = thisBranch[0];
