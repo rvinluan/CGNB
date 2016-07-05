@@ -181,15 +181,14 @@ Board.prototype.existsNodeAt = function(x, y) {
 }
 
 Board.prototype.isOutOfBounds = function(x, y) {
-  if (
+  //I didn't use to have this parenthesis here
+  //and it turns out that's TOTALLY WRONG
+  return (
     x < - Board.gridSize / 2 ||
     x > Board.gridSize / 2 || 
     y < - Board.gridSize / 2 ||
     y > Board.gridSize / 2
-  ) { return true; }
-    else {
-      return false;
-    }
+  );
 }
 
 Board.prototype.getID = function() {
