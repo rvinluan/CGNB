@@ -7,8 +7,10 @@ Enemy.prototype.constructor = Enemy
 
 function Enemy(command) {
   Node.call(this, command)
-  this.mainFill = color(172,96.75);
+  this.typeColor = color(172,96,75);
 }
+
+Enemy.types = ["hacker", "trojan", "beast", "boolean", "bug"];
 
 // Placeholder for running the Enemy. Resets everything.
 Enemy.prototype.run = function() {

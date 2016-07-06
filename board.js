@@ -54,6 +54,8 @@ function Board() {
   this.unplacedNodes = [];
 
   this.bgColor = color(26,21,26);
+
+  this.usedNodeNames = {}
 }
 
 //number of tiles in the grid (each direction)
@@ -63,19 +65,23 @@ Board.gridSize = 8;
 Board.padding = 50;
 Board.gridTileSize = (document.body.clientHeight - Board.padding*2) / Board.gridSize;
 
-Board.usedNodeNames = {}
-
 Board.prototype.init = function() {
+  
   for(var i = 0; i < 20; i++) {
-    var tentativeName = Program.types.randomIn();
-    if (Board.usedNodeNames[tentativeName]) {
-      Board.usedNodeNames[tentativeName]++
+
+    var node
+
+    if (Math.random() > 0.3) { 
+      command = Program.types.randomIn();
+      node = new Program( command )
+      node.getUniqueName()
     } else {
-      Board.usedNodeNames[tentativeName] = 1
+      command = Enemy.types.randomIn();
+      node = new Enemy( command )
+      node.getUniqueName()
     }
-    var command = tentativeName + Board.usedNodeNames[tentativeName]
-    var n = new Program( command );
-    this.unplacedNodes.push( n );
+    
+    this.unplacedNodes.push(node);
   }
   this.openNewArea(this.openNodes[0], 0);
 }

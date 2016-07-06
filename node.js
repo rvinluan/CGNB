@@ -8,7 +8,8 @@ function Node(command) {
     this.id = Math.random() * new Date().getTime(); //lol for now
 
     // The typing command associated with this node
-    this.command = command 
+
+    this.command = command
 
     // Typing purposes
     this.focused = true // Tracks focused state, changes based on typing
@@ -22,19 +23,18 @@ function Node(command) {
     this.typeColor = null // Color, overriden by type of node
 }
 
-Node.prototype.getLocation = function() {
-  return {x:this.x*Board.gridTileSize, y:this.y*Board.gridTileSize}
+Node.prototype.getUniqueName = function() {
+    if (currentBoard.usedNodeNames[this.command]) {
+      currentBoard.usedNodeNames[this.command]++
+    } else {
+      currentBoard.usedNodeNames[this.command] = 1
+    }
+    this.command = this.command + currentBoard.usedNodeNames[this.command]
+    this.untyped = this.command
 }
 
-Node.prototype.render = function() {
-    push();
-    translate(this.x*Board.gridTileSize, this.y*Board.gridTileSize);
-    noStroke();
-    fill(255);
-    rect(0,0,20,20);
-    fill(0);
-    text(this.callSign, 0, 10);
-    pop();
+Node.prototype.getLocation = function() {
+  return {x:this.x*Board.gridTileSize, y:this.y*Board.gridTileSize}
 }
 
 Node.prototype.reset = function(char) {
