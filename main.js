@@ -7,6 +7,6 @@ function setup() {
 }
 
 function draw() {
-    background(26,21,26);
+    background(currentBoard.bgColor);
     currentBoard.render();
 }

@@ -7,11 +7,10 @@ Program.prototype.constructor = Program
 
 function Program(command) {
   Node.call(this, command)
-
-  this.mainFill = color(26,21,26);
-  
-  currentBoard.programs.push(this) // Adds to set of programs on screen
+  this.typeColor = color(109,175,187);
 }
+
+Program.types = ["debug", "ddos", "crack", "cypher", "hack", "corrupt", "horse", "root", "virus"];
 
 // Placeholder for running the program. Resets everything.
 Program.prototype.run = function() {

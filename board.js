@@ -52,6 +52,8 @@ function Board() {
   this.prompt = null;
   this.openNodes = [this.power];
   this.unplacedNodes = [];
+
+  this.bgColor = color(26,21,26);
 }
 
 //number of tiles in the grid (each direction)
@@ -61,11 +63,18 @@ Board.gridSize = 8;
 Board.padding = 50;
 Board.gridTileSize = (document.body.clientHeight - Board.padding*2) / Board.gridSize;
 
-Board.commands = ["debug", "ddos", "crack", "cypher", "hack", "corrupt", "horse", "root", "virus"]
+Board.usedNodeNames = {}
 
 Board.prototype.init = function() {
   for(var i = 0; i < 20; i++) {
-    var n = new Program( Board.commands.randomIn() );
+    var tentativeName = Program.types.randomIn();
+    if (Board.usedNodeNames[tentativeName]) {
+      Board.usedNodeNames[tentativeName]++
+    } else {
+      Board.usedNodeNames[tentativeName] = 1
+    }
+    var command = tentativeName + Board.usedNodeNames[tentativeName]
+    var n = new Program( command );
     this.unplacedNodes.push( n );
   }
   this.openNewArea(this.openNodes[0], 0);
@@ -211,31 +220,31 @@ Board.prototype.removeSpark = function(spark) {
 Board.prototype.findPrograms = function(char) {
   
   var board = this;
-  var matchedPrograms = []
-  var unmatchedPrograms = []
-  var unfocusedPrograms = false
+  var matchedNodes = []
+  var unmatchedNodes = []
+  var unfocusedNodes = false
 
-  board.programs.forEach(function(program) {
+  board.nodes.forEach(function(node) {
     
-    if (!program.focused) { unfocusedPrograms = true }
+    if (!node.focused) { unfocusedNodes = true }
     // If a program is both focused and matches the character
-    if (program.focused && program.is_match(char)) {
-      matchedPrograms.push(program)
+    if (node.focused && node.is_match(char)) {
+      matchedNodes.push(node)
     } else {
-      unmatchedPrograms.push(program)
+      unmatchedNodes.push(node)
     }
 
   })
 
   // If there's only one matched program, set it to autocomplete
-  if (matchedPrograms.length == 1) {
-    matchedPrograms[0].setAuto()
+  if (matchedNodes.length == 1) {
+    matchedNodes[0].setAuto()
   }
 
   var finish = false;
-  matchedPrograms.forEach(function(program) {
+  matchedNodes.forEach(function(node) {
     // Send it the character (received by program.receiveChar())
-    if (board.power.typeChar(char, program)) {
+    if (board.power.typeChar(char, node)) {
       finish = true
     }
   })
@@ -244,10 +253,10 @@ Board.prototype.findPrograms = function(char) {
     return
   }
 
-  if (matchedPrograms.length > 0) {
-    unmatchedPrograms.forEach(function(program) {
+  if (matchedNodes.length > 0) {
+    unmatchedNodes.forEach(function(node) {
       // Otherwise set it as unfocused
-      program.unFocus()
+      node.unFocus()
     })
     return true
   } else {

@@ -6,16 +6,20 @@ function Node(command) {
     this.x = null
     this.y = null
     this.id = Math.random() * new Date().getTime(); //lol for now
-    this.command = command
-    this.untyped = this.command // Tracks what's already been typed (for next char)
-    this.typed = ""
-    this.energized = ""
-    this.focused = true // Tracks focused state (unfocused programs are ignored)
-    this.active = false
-    this.auto = false // Tracks whether only focused program for autocompletion & styling
-    this.running = 0
 
-    this.mainFill = null // Default, overriden by type of node
+    // The typing command associated with this node
+    this.command = command 
+
+    // Typing purposes
+    this.focused = true // Tracks focused state, changes based on typing
+
+    this.untyped = this.command // Tracks untyped letters
+    this.typed = "" // Tracks typed letters
+    this.energized = "" // Tracks letters filled w/ energy
+
+    this.active = false // If the program is currently in use
+
+    this.typeColor = null // Color, overriden by type of node
 }
 
 Node.prototype.getLocation = function() {
@@ -95,46 +99,54 @@ Node.prototype.receiveChar = function(char) {
 }
 
 Node.prototype.render = function() {
-    push();
-    translate(this.getLocation().x, this.getLocation().y);
-    fill(lerpColor(this.mainFill, color(255,255,255), this.running))
-    if (this.running > 0) {
-      this.running-=0.03
-    }
-    strokeWeight(1);
-    stroke(109,175,187)
-    if (this.active) { fill(109,175,187) }
-    textSize(13)
-    if (this.auto) {
-      //stroke(color(0, 255, 0))
-    } else if (this.focused) {
-      stroke(109,175,187)
-    } else {
-      stroke(42,41,44)
-    }
 
     var width = Board.gridTileSize/1.5
     var height = Board.gridTileSize/3
     var padding = 7
+    textSize(13)
+    textFont("Inconsolata")
+    
+
+    push();
+    translate(this.getLocation().x, this.getLocation().y);
+
+
+    // Box
+    
+    strokeWeight(1);
+    stroke(42,41,44)
+    if (this.focused) { stroke(this.typeColor) } 
+
+    fill(currentBoard.bgColor)
+    if (this.active) { fill(this.typeColor) }
+
     rect(0,0,width,height);
     
-    textFont("Inconsolata")
+
+    // Text
+
+    noStroke();
     var charNum = this.command.length
     var currentPos = - charNum*3
 
-    noStroke();
+
+    // Energized
     fill(255);
     for (let char of this.energized) {
       text(char, currentPos, 6)
       currentPos += padding
     }
+
+    // Typed
     fill(100);
     for (let char of this.typed) {
       text(char, currentPos, 6)
       currentPos += padding
     }
+
+    // Untyped
     if (this.focused) {
-      fill(109,175,187)
+      fill(this.typeColor)
       if (this.active) { fill(26,21,26); }
     } else {
       fill(42,41,44)
