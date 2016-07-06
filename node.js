@@ -53,9 +53,7 @@ Node.prototype.unFocus = function() {
     this.typed = ""
     var program = this
     this.energized.split('').forEach(function(char) {
-      console.log("doing it w/ " + char)
       currentBoard.power.createSpark(char, program, true); 
-      
     })
     this.energized = ""
   }

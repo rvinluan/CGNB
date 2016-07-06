@@ -156,7 +156,6 @@ Board.prototype.openNewArea = function(whichNode, whichDirection) {
       this.connections[n.id] = [ new Path(lastVisited, n) ];
     }
     lastVisited = n;
-    console.log(this.connections);
   }
 }
 

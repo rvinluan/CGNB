@@ -1,7 +1,6 @@
 function Spark(char, program, returning) {
   this.char = char
   this.returning = false
-  console.log("returning is " + returning + " and program is " + program)
   if (returning == true) { 
     this.start = createVector(program.loc.x, program.loc.y)
     this.end = createVector(0,0)
@@ -18,7 +17,6 @@ function Spark(char, program, returning) {
   this.speed = 2.5
   this.distance = this.start.dist(this.end)
   this.velocity = this.end.copy().sub(this.start).normalize().mult(this.speed)
-  console.log("distance: " + this.distance)
   this.moving = true
 }
 
