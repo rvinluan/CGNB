@@ -222,6 +222,12 @@ Board.prototype.removeSpark = function(spark) {
   this.sparks.splice(i, 1)
 }
 
+Board.prototype.returnAllSparks = function() {
+  this.sparks.forEach(function(spark) {
+    spark.setReturn()
+  })
+}
+
 Board.prototype.findPrograms = function(char) {
   
   var board = this;
@@ -270,9 +276,10 @@ Board.prototype.findPrograms = function(char) {
 }
 
 Board.prototype.resetAll = function() {
-  this.programs.forEach(function(program) {
-    program.reset()
+  this.nodes.forEach(function(node) {
+    node.reset()
   })
+  this.returnAllSparks()
 }
 
 Board.prototype.runAuto = function() {

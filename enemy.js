@@ -16,10 +16,11 @@ Enemy.types = ["hacker", "trojan", "beast", "boolean", "bug"];
 Enemy.prototype.run = function() {
   console.log("Running: '" + this.command + "'")
   this.running = 1;
+  this.active = true
   // Reset everything
   currentBoard.resetAll()
   currentBoard.addPrompt(new Prompt(this))
-  this.active = true
+  
 
   this.mainFill = color(109,175,187)
 }

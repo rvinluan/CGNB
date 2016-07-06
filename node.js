@@ -40,6 +40,9 @@ Node.prototype.getLocation = function() {
 Node.prototype.reset = function(char) {
   this.untyped = this.command
   this.typed = ""
+  if (this.focused && this.active == false) {
+    this.returnSparks()  
+  }
   this.energized = ""
   this.focused = true
   this.auto = false
@@ -51,12 +54,20 @@ Node.prototype.unFocus = function() {
     this.focused = false
     this.untyped = this.command
     this.typed = ""
-    var program = this
-    this.energized.split('').forEach(function(char) {
-      currentBoard.power.createSpark(char, program, true); 
-    })
+    this.returnSparks()
     this.energized = ""
   }
+}
+
+Node.prototype.returnSparks = function() {
+  var program = this
+  this.untyped = this.typed + this.untyped
+  this.typed = ""
+  this.energized.split('').forEach(function(char, i) {
+    setTimeout(function() {
+      currentBoard.power.createSpark(char, program, true);
+    },70*i)
+  })
 }
 
 // Sets the object to autocomplete and redraws

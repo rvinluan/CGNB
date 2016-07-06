@@ -1,20 +1,19 @@
-function Spark(char, program, returning) {
+function Spark(char, node, returning) {
   this.char = char
-  this.returning = false
   if (returning == true) { 
-    this.start = createVector(program.loc.x, program.loc.y)
+    this.start = createVector(node.getLocation().x, node.getLocation().y)
     this.end = createVector(0,0)
     this.returning = true
     this.active = false
   } else {
-    this.program = program
+    this.node = node
     this.start = createVector(0,0)
-    this.end = createVector(program.getLocation().x, program.getLocation().y)
+    this.end = createVector(node.getLocation().x, node.getLocation().y)
     this.active = true
   }
   
   this.loc = this.start.copy()
-  this.speed = 2.5
+  this.speed = 4
   this.distance = this.start.dist(this.end)
   this.velocity = this.end.copy().sub(this.start).normalize().mult(this.speed)
   this.moving = true
@@ -39,7 +38,7 @@ Spark.prototype.render = function() {
     if (this.returning) {
       currentBoard.power.energy += 1
     } else {
-      this.program.receiveChar(this.char)
+      this.node.receiveChar(this.char)
     }
 
     this.moving = false
@@ -50,7 +49,7 @@ Spark.prototype.render = function() {
 }
 
 Spark.prototype.checkActive = function() {
-  if (this.active && this.program.focused == false) {
+  if (this.active && this.node.focused == false) {
     this.active = false
 
     this.end = createVector(0,0)
@@ -61,4 +60,8 @@ Spark.prototype.checkActive = function() {
     this.returning = true
     
   }
+}
+
+Spark.prototype.setReturn = function() {
+  this.returning = true
 }
