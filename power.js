@@ -81,26 +81,3 @@ Power.prototype.typeChar = function(char, program) {
 Power.prototype.createSpark = function(char, program, returning) {
   currentBoard.sparks.push(new Spark(char, program, returning))
 }
-
-
-// Get keypress and pass to program
-document.addEventListener('keydown', function(e) {
-
-  // Any alphanumeric key to search for programs
-  var char = e.key; 
-  if(/[a-zA-Z0-9]/.test(char) && char.length == 1 && char != " ") {
-    currentBoard.power.newChar(char)
-  }
-
-  // ON SECOND THOUGHT auto doesn't feel very fun
-  // Return key to run current command and reset
-  // if (e.keyCode && e.keyCode == '13') {
-  //   currentBoard.runAuto()
-  // }
-
-  // Escape, backspace, or delete keys to reset
-  if (e.keyCode == '8' || e.keyCode == '27' || e.keyCode == '46') {
-    currentBoard.resetAll()
-  }
-
-})
