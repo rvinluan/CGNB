@@ -15,7 +15,7 @@ function Node(command) {
     this.auto = false // Tracks whether only focused program for autocompletion & styling
     this.running = 0
 
-    this.mainFill = color(100) // Default, overriden by type of node
+    this.mainFill = null // Default, overriden by type of node
 }
 
 Node.prototype.getLocation = function() {
