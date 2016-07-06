@@ -5,7 +5,16 @@ function Screen(board) {
 
 function KeyboardListener() {
   var listener = this
-  listener.state = Program
+  listener.state = 0
+  /* 
+  // Possible states:
+  // 0: Program mode. Listening for Programs and Branches. 
+  //    Sending sparks to programs. 
+  //    Fading/highlighting letters on Program boxes.
+  // 1: Prompt mode. Listening for a specific argument (Enemy/Wall/Branch/Program) based on the prompt.
+  //    Adding letters to prompts.
+  //    Highlighting letters on boxes that match type and characters.
+  */
 
   // Get keypress and pass to function
   document.addEventListener('keydown', this.sendChar)
