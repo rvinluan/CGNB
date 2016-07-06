@@ -272,34 +272,6 @@ Board.prototype.runAuto = function() {
 }
 
 /*
-/ Node.
-/ A Node is usually a Program, Enemy, or Wall.
-*/
-function Node() {
-    this.x = Math.floor(random(-Board.gridSize/2, Board.gridSize/2));
-    this.y = Math.floor(random(-Board.gridSize/2, Board.gridSize/2));
-    this.id = Math.random() * new Date().getTime(); //lol for now
-    //Open Question: should programs be a type/subclass of node or should a node contain a program as an instance variable?
-    //this.type = 0;
-    //this.program = null;
-}
-
-Node.prototype.getLocation = function() {
-  return {x:this.x*Board.gridTileSize, y:this.y*Board.gridTileSize}
-}
-
-Node.prototype.render = function() {
-    push();
-    translate(this.x*Board.gridTileSize, this.y*Board.gridTileSize);
-    noStroke();
-    fill(255);
-    rect(0,0,20,20);
-    fill(0);
-    text(this.callSign, 0, 10);
-    pop();
-}
-
-/*
 / Path.
 / Connects two nodes.
 / Various things can travel along paths and animate along the length of them
