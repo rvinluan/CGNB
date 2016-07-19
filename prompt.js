@@ -7,32 +7,54 @@ function Prompt(program) {
   this.currentPos = -this.width/2+20
   this.padding = 13
   this.argumentType = program.argumentType
+  this.argument = ""
 }
 
 Prompt.prototype.render = function() {
   var prompt = this
   push()
-  translate(this.loc.x, this.loc.y)
+
+  // reset currentPos
+  prompt.currentPos = -prompt.width/2+20
+
+  translate(prompt.loc.x, prompt.loc.y)
   stroke(255)
   strokeWeight(3)
   fill(26,21,26)
-  rect(0,0, this.width, this.height)
+  rect(0,0, prompt.width, prompt.height)
   fill(255)
   noStroke()
   textFont("Inconsolata")
   textSize(22)
-  text(">", -this.width/2+20, 6)
-
   fill(109,175,187)
-  this.program.command.split('').forEach(function(char, i) {
-    text(char, -prompt.width/2+45+i*prompt.padding, 6)
+  text(">", prompt.currentPos, 6)
+  prompt.currentPos += 20
+
+  prompt.program.command.split('').forEach(function(char, i) {
+    prompt.currentPos += prompt.padding
+    text(char, prompt.currentPos, 6)
   })
+
+  prompt.currentPos += 35
+
+  var argColor = color(255)
+  if (prompt.argumentType == Enemy) {
+    argColor = color(172,96,75)
+  }
+
+  fill(argColor)
+  text(">", prompt.currentPos, 6)
+
+  prompt.currentPos += 20
+
+  prompt.argument.split('').forEach(function(char, i) {
+    prompt.currentPos += prompt.padding
+    text(char, prompt.currentPos, 6)
+  })
+
   pop()
 }
 
 Prompt.prototype.newChar = function(char) {
-  noStroke()
-  textFont("Inconsolata")
-  textSize(22)
-  fill(255)
+  this.argument += char
 }
