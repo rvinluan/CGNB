@@ -33,7 +33,6 @@ Array.prototype.randomIn = function() {
   return this[ Math.floor(Math.random() * this.length) ];
 }
 
-
 /*
 / The Board.
 / Contains a list of Nodes and their connections.
@@ -228,68 +227,11 @@ Board.prototype.returnAllSparks = function() {
   })
 }
 
-Board.prototype.findPrograms = function(char) {
-  
-  var board = this;
-  var matchedNodes = []
-  var unmatchedNodes = []
-  var unfocusedNodes = false
-
-  board.nodes.forEach(function(node) {
-    
-    if (!node.focused) { unfocusedNodes = true }
-    // If a program is both focused and matches the character
-    if (node.focused && node.is_match(char)) {
-      matchedNodes.push(node)
-    } else {
-      unmatchedNodes.push(node)
-    }
-
-  })
-
-  // If there's only one matched program, set it to autocomplete
-  if (matchedNodes.length == 1) {
-    matchedNodes[0].setAuto()
-  }
-
-  var finish = false;
-  matchedNodes.forEach(function(node) {
-    // Send it the character (received by program.receiveChar())
-    if (board.power.typeChar(char, node)) {
-      finish = true
-    }
-  })
-
-  if (finish) {
-    return
-  }
-
-  if (matchedNodes.length > 0) {
-    unmatchedNodes.forEach(function(node) {
-      // Otherwise set it as unfocused
-      node.unFocus()
-    })
-    return true
-  } else {
-    return false
-  }
-}
-
 Board.prototype.resetAll = function() {
   this.nodes.forEach(function(node) {
     node.reset()
   })
   this.returnAllSparks()
-}
-
-Board.prototype.runAuto = function() {
-  var board = this
-  this.programs.forEach(function(program) {
-    if (program.auto) {
-      program.run();
-      board.resetAll()
-    }
-  })
 }
 
 /*
