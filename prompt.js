@@ -2,10 +2,11 @@ function Prompt(program) {
   this.program = program
   this.animationState = 0;
   this.loc = {x: 0, y: 200}
-  this.width = Board.gridTileSize*16
-  this.height = Board.gridTileSize*2
+  this.width = Board.gridTileSize*6
+  this.height = Board.gridTileSize*0.8
   this.currentPos = -this.width/2+20
   this.padding = 13
+  this.argumentType = program.argumentType
 }
 
 Prompt.prototype.render = function() {
@@ -27,4 +28,11 @@ Prompt.prototype.render = function() {
     text(char, -prompt.width/2+45+i*prompt.padding, 6)
   })
   pop()
+}
+
+Prompt.prototype.newChar = function(char) {
+  noStroke()
+  textFont("Inconsolata")
+  textSize(22)
+  fill(255)
 }

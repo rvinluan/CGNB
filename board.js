@@ -48,7 +48,6 @@ function Board() {
   this.currentID = 0
   this.power = new Power(0,0,20)
   this.sparks = [];
-  this.prompt = null;
   this.openNodes = [this.power];
   this.unplacedNodes = [];
 
@@ -108,7 +107,6 @@ Board.prototype.render = function() {
   this.nodes.forEach(n => n.render());
   this.power.render()
   this.sparks.forEach(s => s.render())
-  // if (this.prompt != null) { this.prompt.render() }
 }
 
 /* LAYOUT GENERATION
@@ -206,14 +204,6 @@ Board.prototype.isOutOfBounds = function(x, y) {
 
 Board.prototype.getID = function() {
   return this.currentID++
-}
-
-Board.prototype.addPrompt = function(prompt) {
-  this.prompt = prompt
-}
-
-Board.prototype.removePrompt = function() {
-  this.prompt = null
 }
 
 Board.prototype.removeSpark = function(spark) {

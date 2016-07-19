@@ -63,7 +63,7 @@ Power.prototype.newChar = function(char) {
   if (this.energy > 0) {
     this.char = char
     this.fade = 255
-    if (currentScreen.listener.findPrograms(char)) {
+    if (currentScreen.listener.findNodes(char)) {
       this.charMatch = true
       this.energy--
       this.recharge = 0

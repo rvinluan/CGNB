@@ -3,11 +3,12 @@
 */
 
 Program.prototype = new Node()
-Program.prototype.constructor = Program
+Program.prototype.constructor = Program 
 
 function Program(command) {
   Node.call(this, command)
   this.typeColor = color(109,175,187);
+  this.argumentType = Enemy
 }
 
 Program.types = ["debug", "ddos", "crack", "cypher", "hack", "corrupt", "horse", "root", "virus"];
@@ -19,7 +20,7 @@ Program.prototype.run = function() {
   this.active = true
   // Reset everything
   currentBoard.resetAll()
-  currentBoard.addPrompt(new Prompt(this))
+  currentScreen.addPrompt(new Prompt(this))
   
 
   this.mainFill = color(109,175,187)

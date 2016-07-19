@@ -10,5 +10,5 @@ function setup() {
 
 function draw() {
     background(currentBoard.bgColor);
-    currentBoard.render();
+    currentScreen.render();
 }
