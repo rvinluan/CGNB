@@ -56,5 +56,7 @@ Prompt.prototype.render = function() {
 }
 
 Prompt.prototype.newChar = function(char) {
-  this.argument += char
+  if (currentScreen.listener.findNodes(char)) {
+    this.argument += char
+  }
 }
