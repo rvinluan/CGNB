@@ -231,7 +231,7 @@ Board.prototype.shortestPathBetween = function(startNode, endNode) {
 
         if(smallest == endNode) {
           while(previous[smallest]) {
-            workingPath.push(smallest);
+            workingPath.push( this.getPathBetween(smallest, previous[smallest]) );
             smallest = previous[smallest];
           }
 
@@ -259,7 +259,7 @@ Board.prototype.shortestPathBetween = function(startNode, endNode) {
         }
       }
 
-      return workingPath;
+      return workingPath.reverse();
 }
 
 Board.prototype.relativeDirectionFrom = function(originX, originY, d) {
@@ -303,6 +303,17 @@ Board.prototype.isOutOfBounds = function(x, y) {
     y < - Board.gridSize / 2 ||
     y > Board.gridSize / 2
   );
+}
+
+Board.prototype.getPathBetween = function(a, b) {
+  for(c in this.connections[a]) {
+    if(this.connections[a].hasOwnProperty(c)) {
+      if(this.connections[a][c].otherEnd(a).id == b) {
+        return this.connections[a][c];
+      }
+    }
+  }
+  return null;
 }
 
 Board.prototype.getID = function() {
