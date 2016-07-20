@@ -321,7 +321,9 @@ Board.prototype.returnAllSparks = function() {
 }
 
 Board.prototype.resetAll = function() {
-  this.nodes.forEach(function(node) {
+  this.nodes.filter(function(node) {
+    return !(node instanceof Power)
+  }).forEach(function(node) {
     node.reset()
   })
   this.returnAllSparks()
