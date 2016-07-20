@@ -5,6 +5,32 @@
     //or perhaps that will fix itself when we don't have a random layout
 //TODO: more elegant sizing and positioning of the board relative to the canvas
 //GENERAL NOTE: the random() functions used here are p5's random functions.
+
+//begin helper functions
+
+/**
+ * PriorityQueue, from https://github.com/mburst/dijkstras-algorithm/blob/master/dijkstras.js
+ */
+function PriorityQueue () {
+  this._nodes = [];
+
+  this.enqueue = function (priority, key) {
+    this._nodes.push({key: key, priority: priority });
+    this.sort();
+  }
+  this.dequeue = function () {
+    return this._nodes.shift().key;
+  }
+  this.sort = function () {
+    this._nodes.sort(function (a, b) {
+      return a.priority - b.priority;
+    });
+  }
+  this.isEmpty = function () {
+    return !this._nodes.length;
+  }
+}
+
 var random = function (min, max) {
 
   var rand = Math.random()
@@ -32,6 +58,8 @@ var random = function (min, max) {
 Array.prototype.randomIn = function() {
   return this[ Math.floor(Math.random() * this.length) ];
 }
+
+//end helper functions
 
 /*
 / The Board.
@@ -66,7 +94,7 @@ Board.gridTileSize = (document.body.clientHeight - Board.padding*2) / Board.grid
 
 Board.prototype.init = function() {
   
-  for(var i = 0; i < 20; i++) {
+  for(var i = 0; i < 13; i++) {
 
     var node
 
@@ -82,6 +110,7 @@ Board.prototype.init = function() {
     
     this.unplacedNodes.push(node);
   }
+  this.nodes.push(this.power);
   this.openNewArea(this.openNodes[0], 0);
 }
 
@@ -133,7 +162,7 @@ Board.prototype.openNewArea = function(whichNode, whichDirection) {
     var possibleDirections = [0,1,2,3];
     var d = i == 0 ? whichDirection : possibleDirections.randomIn();
     var coord = this.relativeDirectionFrom(lastVisited.x, lastVisited.y, d);
-    while(this.existsNodeAt(coord.x, coord.y) || this.isOutOfBounds(coord.x, coord.y)) {
+    while(this.getNodeAt(coord.x, coord.y) || this.isOutOfBounds(coord.x, coord.y)) {
       possibleDirections.splice(possibleDirections.indexOf(d), 1);
       if(possibleDirections.length > 0) {
         d = possibleDirections.randomIn();
@@ -149,13 +178,90 @@ Board.prototype.openNewArea = function(whichNode, whichDirection) {
     n.y = coord.y;
     this.nodes.push(n);
     thisBranch.push(n);
-    if(this.connections[n.id]) {
-      this.connections[n.id].push[ new Path(lastVisited, n) ];
-    } else {
-      this.connections[n.id] = [ new Path(lastVisited, n) ];
+    this.connect(n, lastVisited);
+    possibleDirections = [0,1,2,3];
+    for(var j = 0; j < possibleDirections.length; j++) {
+      var tryCoord = this.relativeDirectionFrom(n.x, n.y, possibleDirections[j]);
+      var neighbor = this.getNodeAt(tryCoord.x, tryCoord.y);
+      if(neighbor && Math.random() < 0.25) {
+        this.connect(n, neighbor);
+      }
     }
     lastVisited = n;
   }
+}
+
+Board.prototype.connect = function(a, b) {
+  var pathBetween = new Path(a, b);
+  if(this.connections[a.id]) {
+    this.connections[a.id].push( pathBetween );
+  } else {
+    this.connections[a.id] = [ pathBetween ];
+  }
+  if(this.connections[b.id]) {
+    this.connections[b.id].push( pathBetween );
+  } else {
+    this.connections[b.id] = [ pathBetween ];
+  }
+}
+
+//Dijkstra's Algorithm
+//from https://github.com/mburst/dijkstras-algorithm/blob/master/dijkstras.js
+//returns an array of Path objects
+Board.prototype.shortestPathBetween = function(startNode, endNode) {
+  var nodeQueue = new PriorityQueue(),
+      distances = {},
+      previous = {},
+      workingPath = [],
+      smallest, vertex, neighbor, alt;
+
+      for(vertex in this.connections) {
+        if(vertex == startNode) {
+          distances[vertex] = 0;
+          nodeQueue.enqueue(0, vertex);
+        }
+        else {
+          distances[vertex] = Infinity;
+          nodeQueue.enqueue(Infinity, vertex);
+        }
+
+        previous[vertex] = null;
+      }
+
+      while(!nodeQueue.isEmpty()) {
+        smallest = nodeQueue.dequeue();
+
+        if(smallest == endNode) {
+          while(previous[smallest]) {
+            workingPath.push(smallest);
+            smallest = previous[smallest];
+          }
+
+          break;
+        }
+
+        if(!smallest || distances[smallest] === Infinity){
+          continue;
+        }
+
+
+        for(edge in this.connections[smallest]) {
+          if(!this.connections[smallest].hasOwnProperty(edge)) {
+            continue;
+          }
+          neighbor = this.connections[smallest][edge].otherEnd(smallest).id;
+          alt = distances[smallest] + this.connections[smallest][edge].length;
+
+          if(alt < distances[neighbor]) {
+            distances[neighbor] = alt;
+            previous[neighbor] = smallest;
+
+            nodeQueue.enqueue(alt, neighbor);
+          }
+        }
+      }
+
+      return workingPath;
 }
 
 Board.prototype.relativeDirectionFrom = function(originX, originY, d) {
@@ -181,16 +287,13 @@ Board.prototype.relativeDirectionFrom = function(originX, originY, d) {
   return ro;
 }
 
-Board.prototype.existsNodeAt = function(x, y) {
-  if(x == 0 && y == 0) {
-    return true;
-  }
+Board.prototype.getNodeAt = function(x, y) {
   for(n in this.nodes) {
     if(this.nodes[n].x == x && this.nodes[n].y == y) {
-      return true;
+      return this.nodes[n];
     }
   }
-  return false;
+  return null;
 }
 
 Board.prototype.isOutOfBounds = function(x, y) {
@@ -243,6 +346,7 @@ Board.prototype.resetAll = function() {
 function Path(previous, next) {
     this.previous = previous;
     this.next = next;
+    this.length = 1;
 }
 
 Path.prototype.render = function() {
@@ -256,4 +360,14 @@ Path.prototype.render = function() {
     //test?
     line( this.previous.x*gss, this.previous.y*gss, this.next.x*gss, this.next.y*gss);
 
+}
+
+Path.prototype.otherEnd = function(endId) {
+  if(this.previous.id == endId) {
+    return this.next;
+  }
+  if(this.next.id == endId) {
+    return this.previous;
+  }
+  return null;
 }

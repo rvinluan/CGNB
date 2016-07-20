@@ -8,6 +8,7 @@ function Power(x, y, energy) {
   this.recharge = 0;
   this.rechargeRate = 60;
   this.charMatch = true;
+  this.id = Math.random() * new Date().getTime();
 }
 
 Power.prototype.render = function() {
