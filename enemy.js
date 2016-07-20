@@ -19,7 +19,7 @@ Enemy.prototype.run = function() {
   this.active = true
   // Reset everything
   currentBoard.resetAll()
-  currentBoard.addPrompt(new Prompt(this))
+  currentScreen.removePrompt()
   
 
   this.mainFill = color(109,175,187)
