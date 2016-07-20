@@ -1,11 +1,28 @@
 function Screen(board) {
   this.listener = new KeyboardListener()
   this.board = board // Temporary
+  this.prompt = null
+}
+
+Screen.prototype.addPrompt = function(prompt) {
+  this.prompt = prompt
+  this.listener.state = 1
+}
+
+Screen.prototype.removePrompt = function() {
+  this.prompt = null
+  this.listener.state = 0
+}
+
+Screen.prototype.render = function() {
+  this.board.render();
+  if (this.prompt != null) {
+    this.prompt.render();
+  }
 }
 
 function KeyboardListener() {
-  var listener = this
-  listener.state = 0
+  this.state = 0 
   /* 
   // Possible states:
   // 0: Program mode. Listening for Programs and Branches. 
@@ -21,15 +38,35 @@ function KeyboardListener() {
 }
 
 KeyboardListener.prototype.sendChar = function(e) {
-    // Any alphanumeric key to search for programs
-    var char = e.key; 
+    var listener = currentScreen.listener
+    // Any alphanumeric key to search for programs / enemies
+    var char = e.key;
     if(/[a-zA-Z0-9]/.test(char) && char.length == 1 && char != " ") {
-      currentBoard.power.newChar(char)
+      switch(listener.state) {
+        case 0: 
+          currentBoard.power.newChar(char); 
+          break;
+        case 1: 
+          currentScreen.prompt.newChar(char); 
+          break;
+      }
     }
 
     // Escape, backspace, or delete keys to reset
     if (e.keyCode == '8' || e.keyCode == '27' || e.keyCode == '46') {
-      currentBoard.resetAll()
+      switch(listener.state) {
+        case 0: 
+          currentBoard.resetAll();
+          break;
+        case 1: 
+          if (e.keyCode == '27') {
+            currentBoard.resetAll()
+            currentScreen.removePrompt()
+          } else if (e.keyCode == '8' || e.keyCode == '46') {
+            currentScreen.prompt.clear()    
+          }
+          break;
+      }
     }
 }
 
@@ -37,14 +74,22 @@ KeyboardListener.prototype.changeState = function(state) {
   this.state = state
 }
 
-KeyboardListener.prototype.findPrograms = function(char) {
+KeyboardListener.prototype.checkType = function(program) {
+  if (currentScreen.listener.state == 0) {
+    return program instanceof Program// || program instanceof NewAreaMarker
+  } else {
+    return program instanceof currentScreen.prompt.argumentType  
+  }
+}
+
+KeyboardListener.prototype.findNodes = function(char) {
   
   var board = currentScreen.board;
   var matchedNodes = []
   var unmatchedNodes = []
   var unfocusedNodes = false
 
-  board.nodes.forEach(function(node) {
+  board.nodes.filter(this.checkType).forEach(function(node) {
     
     if (!node.focused) { unfocusedNodes = true }
     // If a program is both focused and matches the character
@@ -83,17 +128,3 @@ KeyboardListener.prototype.findPrograms = function(char) {
     return false
   }
 }
-
-// KeyboardListener.prototype.newChar = function(char) {
-//   if (this.energy > 0) {
-//     this.char = char
-//     this.fade = 255
-//     if (currentBoard.findPrograms(char)) {
-//       this.charMatch = true
-//       this.energy--
-//       this.recharge = 0
-//     } else {
-//       this.charMatch = false
-//     }
-//   }
-// }
